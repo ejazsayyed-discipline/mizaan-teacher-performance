@@ -1,23 +1,25 @@
 {
-  "id": "/mizaan-teacher-performance/",
-  "name": "Mizaan English School - Teacher Evaluation",
+  "id": "./",
+  "name": "Mizaan Teacher Performance",
   "short_name": "Mizaan TPE",
-  "description": "Teacher Performance Evaluation App",
-  "start_url": "./index.html",
+  "description": "Teacher Performance Evaluation - Mizaan English School, Latur",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#142943",
+  "theme_color": "#263746",
   "icons": [
     {
       "src": "./icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "./icons/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }
