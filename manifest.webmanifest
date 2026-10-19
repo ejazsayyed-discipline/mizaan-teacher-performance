@@ -1,0 +1,25 @@
+{
+  "id": "./",
+  "name": "Mizaan Teacher Performance",
+  "short_name": "Mizaan TPE",
+  "description": "Teacher Performance Evaluation - Mizaan English School, Latur",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#263746",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
