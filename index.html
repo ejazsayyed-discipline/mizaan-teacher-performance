@@ -88,7 +88,8 @@ function openShareFor(id){go('sharing');document.getElementById('shareTeacher').
 function quickShare(id){openShareFor(id)}
 function printTeacherReport(){let msg=makeMessage(),t=teacher(document.getElementById('shareTeacher').value);if(!t)return;printHtml('Teacher Performance Report',msg.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'))}
 function printReport(){let sec=document.getElementById('reportSection').value,f=document.getElementById('reportFrequency').value,p=document.getElementById('reportPeriod').value;let rank=ranking(sec,f,p),text=`${settings.school}\nTeacher Performance Analytics\nScope: ${sec==='all'?'Whole school':sec} | ${f==='all'?'All frequencies':f}${p?' | '+p:''}\n\nTop 5:\n${rank.slice(0,5).map((x,i)=>`${i+1}. ${x.t.name} — ${fmt(x.pct)} (${x.count} records)`).join('\n')}\n\nBottom 5:\n${rank.slice(-5).reverse().map((x,i)=>`${i+1}. ${x.t.name} — ${fmt(x.pct)} (${x.count} records)`).join('\n')}\n\nImprovement areas:\n${improvementItems(data.records.filter(r=>(sec==='all'||r.section===sec)&&(f==='all'||r.frequency===f)&&(!p||String(r.period).toLowerCase().includes(p.toLowerCase())))).map(x=>`${x.name}: ${fmt(x.pct)}`).join('\n')}`;printHtml('Teacher Performance Analytics',esc(text))}
-function printHtml(title,body){let w=window.open('','_blank');if(!w){toast('Allow pop-ups to generate the print-ready report.');return}w.document.write(`<!doctype html><html><head><title>${esc(title)}</title><meta charset="utf-8"><style>body{font:13px Arial,sans-serif;color:#222;padding:32px;max-width:850px;margin:auto}h1{font-size:22px;border-bottom:2px solid #14283f;padding-bottom:12px}pre{font:13px/1.65 Arial,sans-serif;white-space:pre-wrap}footer{margin-top:30px;color:#666;font-size:10px}@media print{button{display:none}}</style></head><body><h1>${esc(settings.school)}</h1><h2>${esc(title)}</h2><pre>${body}</pre><footer>Confidential · Generated from the Teacher Performance Evaluation app</footer><button onclick="window.print()">Print / Save as PDF</button></body></html>`);w.document.close();}
+function printHtml(title,body){let w=window.open('','_blank');if(!w){toast('Allow pop-ups to generate the print-ready report.');return}w.document.write(`<!doctype html><html><head><title>${esc(title)}</title><meta charset="utf-8"><style>body{font:13px Arial,sans-serif;color:#222;padding:32px;max-width:850px;margin:auto}h1{font-size:22px;border-bottom:2px solid #14283f;padding-bottom:12px}pre{font:13px/1.65 Arial,sans-serif;white-space:pre-wrap}footer{margin-top:30px;color:#666;font-size:10px}@media print{button{display:none}}</style></head><body><h1>${esc(settings.school)}</h1><h2>${esc(title)}</h2><pre>${body}</pre><footer>Confidential · Generated from the Teacher Performance Evaluation app</footer><button onclick="window.print()">Print / Save as PDF</button>
+</body></html>`);w.document.close();}
 function exportCSV(){const cols=['Teacher ID','Teacher Name','Frequency','Period','Section','Earned','Maximum','Performance %','Remarks','Source'];const rows=data.records.map(r=>{let s=score(r);return [r.teacherId,recTeacherName(r),r.frequency,r.period,r.section,s.earned,s.max,s.pct==null?'':s.pct.toFixed(2),r.remarks||'',r.source||'App']});downloadFile('teacher-evaluation-records.csv',[cols,...rows].map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n'),'text/csv;charset=utf-8');}
 function backup(){downloadFile('mizaan-teacher-performance-backup-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify({data,settings,exportedAt:new Date().toISOString()},null,2),'application/json');toast('Backup exported.')}
 function downloadFile(name,content,type){const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1500)}
@@ -612,4 +613,15 @@ attachEvaluationSubmitHandler();
 sessionStorage.removeItem('mizaantpe-auth');
 showLoginGate(true);
 if('serviceWorker' in navigator && location.protocol!=='file:'){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
-</script></body></html>
+</script>
+<script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./service-worker.js")
+          .catch(error => console.error(
+            "Service worker registration failed:", error
+          ));
+      });
+    }
+  </script>  
+</body></html>
