@@ -40,13 +40,43 @@ function mergeSeedWithSaved(saved,seed){
   return {...cloneJson(seed),...saved,teachers,records,criteria:{...seed.criteria,...(saved.criteria||{})},
     importSummary:seed.importSummary||saved.importSummary};
 }
-try{
-  const saved=JSON.parse(localStorage.getItem(KEYS.data)||'null');
-  data=mergeSeedWithSaved(saved,INITIAL);
-  // Immediately persist the recovered workbook seed so later tabs and reloads use the same complete dataset.
-  localStorage.setItem(KEYS.data,JSON.stringify(data));
-}catch(e){data=cloneJson(INITIAL)}
-try{settings=JSON.parse(localStorage.getItem(KEYS.settings)||'null')||cloneJson(defaultSettings)}catch(e){settings=cloneJson(defaultSettings)}
+// DATA-PRESERVATION PATCH: never merge saved records with the embedded workbook seed during an update.
+// Existing valid browser data/settings are loaded exactly as saved. Defaults are written only when a key is absent.
+// If saved JSON exists but cannot be parsed, stop rather than silently replacing it with defaults.
+{
+  const savedRaw=localStorage.getItem(KEYS.data);
+  if(savedRaw===null){
+    data=cloneJson(INITIAL);
+    localStorage.setItem(KEYS.data,JSON.stringify(data));
+  }else{
+    try{
+      const saved=JSON.parse(savedRaw);
+      if(!saved||typeof saved!=='object'||Array.isArray(saved))throw new Error('Saved Mizaan data is not a valid data object.');
+      data=saved;
+    }catch(e){
+      console.error('Mizaan data preservation guard stopped startup:',e);
+      alert('Mizaan could not read the saved data safely. Your saved data has NOT been replaced. Do not clear browser data. Restore from your exported backup or seek assistance before continuing.');
+      throw e;
+    }
+  }
+}
+{
+  const settingsRaw=localStorage.getItem(KEYS.settings);
+  if(settingsRaw===null){
+    settings=cloneJson(defaultSettings);
+    localStorage.setItem(KEYS.settings,JSON.stringify(settings));
+  }else{
+    try{
+      const savedSettings=JSON.parse(settingsRaw);
+      if(!savedSettings||typeof savedSettings!=='object'||Array.isArray(savedSettings))throw new Error('Saved Mizaan settings are not a valid settings object.');
+      settings=savedSettings;
+    }catch(e){
+      console.error('Mizaan settings preservation guard stopped startup:',e);
+      alert('Mizaan could not read the saved settings safely. Your saved settings have NOT been replaced. Do not clear browser data. Restore from your exported backup or seek assistance before continuing.');
+      throw e;
+    }
+  }
+}
 function persist(){localStorage.setItem(KEYS.data,JSON.stringify(data));localStorage.setItem(KEYS.settings,JSON.stringify(settings));updateBrand()}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function score(rec){let earned=0,max=0,count=0;for(const v of Object.values(rec.ratings||{})){if(v==='N/A'||v===null||v===undefined||v==='')continue;const n=Number(v);if(!Number.isFinite(n))continue;earned+=n;max+=10;count++}return {earned,max,pct:max?earned/max*100:null,count}}
